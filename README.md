@@ -62,28 +62,3 @@ as a learning assistant: it explained concepts and reviewed my work, and I wrote
 ## License
 
 [MIT](LICENSE)
-
-Things to notice:
-1. - [x] and - [ ] are task lists. GitHub draws them as checkboxes. You'll
-## Roadmap
-
-- [x] 1. Foundations: repo structure, license, tooling
-- [ ] 2. Local Terraform: network, VM, Key Vault
-- [ ] 3. Remote backend for Terraform state
-- [ ] 4. CI/CD with GitHub Actions (OIDC)
-- [ ] 5. k3s on the VM
-- [ ] 6. Argo CD (GitOps)
-- [ ] 7. PostgreSQL + pgvector (`app_db`, `vector_db`)
-- [ ] 8. Secrets with Azure Key Vault
-- [ ] 9. Verification with k9s
-- [ ] 10. Final documentation
-
-## About
-
-Built by **Juan Diego Giraldo Ospina** ([@JuanDiego500-sys](https://github.com/JuanDiego500-sys))
-as a learning and portfolio project. I used [Claude Code](https://claude.com/claude-code)
-as a learning assistant: it explained concepts and reviewed my work, and I wrote and committed the code.
-
-## License
-
-[MIT](LICENSE)
