@@ -1,0 +1,49 @@
+# ---------- Terraform ----------
+# Provider plugins downloaded by `terraform init`. Big binaries; anyone can re-download them.
+**/.terraform/*
+
+# State files: Terraform's "memory" of what exists in Azure.
+# They can contain secrets in plain text. In Phase 3 the state moves to Azure Storage.
+*.tfstate
+*.tfstate.*
+
+# Crash logs from Terraform itself
+crash.log
+crash.*.log
+
+# Real variable values (e.g. your IP address, subscription ID). Never commit these.
+*.tfvars
+*.tfvars.json
+# ...except example files, which show the format with fake values
+!*.tfvars.example
+
+# Local overrides: personal tweaks that shouldn't affect anyone else
+override.tf
+override.tf.json
+*_override.tf
+*_override.tf.json
+
+# Terraform CLI config (can hold API tokens)
+.terraformrc
+terraform.rc
+
+# Saved plan files (binary, may contain sensitive values)
+*.tfplan
+
+# NOTE: .terraform.lock.hcl is NOT ignored on purpose. Commit it, so your PC and
+# GitHub Actions use exactly the same provider versions.
+
+# ---------- Secrets & keys ----------
+.env
+*.pem
+*.key
+id_rsa*
+id_ed25519*
+kubeconfig
+*.kubeconfig
+
+# ---------- OS / editor ----------
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
