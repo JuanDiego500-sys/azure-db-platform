@@ -42,3 +42,15 @@ variable "ssh_public_key_path" {
   type        = string
   default     = "~/.ssh/id_ed25519_azure.pub"
 }
+
+variable "auto_shutdown_time" {
+  description = "Daily time (HHmm, 24h) when the VM is shut down and deallocated."
+  type        = string
+  default     = "2300"
+}
+
+variable "auto_shutdown_timezone" {
+  description = "Windows timezone ID for the shutdown schedule (e.g. 'SA Pacific Standard Time' = Bogotá, UTC-5)."
+  type        = string
+  default     = "SA Pacific Standard Time"
+}

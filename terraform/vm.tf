@@ -50,3 +50,17 @@ resource "azurerm_linux_virtual_machine" "main" {
     version   = "latest"
   }
 }
+# Daily auto-shutdown: a cost guardrail in case I forget to deallocate the VM
+resource "azurerm_dev_test_global_vm_shutdown_schedule" "main" {
+  virtual_machine_id = azurerm_linux_virtual_machine.main.id
+  location           = azurerm_resource_group.main.location
+  enabled            = true
+
+  daily_recurrence_time = var.auto_shutdown_time # "HHmm", 24h format
+  timezone              = var.auto_shutdown_timezone
+
+  notification_settings {
+    enabled = false
+  }
+  tags = var.tags
+}
