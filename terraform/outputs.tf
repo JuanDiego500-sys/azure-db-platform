@@ -17,3 +17,13 @@ output "ssh_command" {
   description = "Command to connect to the VM."
   value       = "ssh -i ~/.ssh/id_ed25519_azure ${var.admin_username}@${azurerm_public_ip.vm.ip_address}"
 }
+
+output "key_vault_name" {
+  description = "Name of the Key Vault (includes a random suffix)."
+  value       = azurerm_key_vault.main.name
+}
+
+output "key_vault_uri" {
+  description = "URI used by apps and External Secrets Operator to reach the vault."
+  value       = azurerm_key_vault.main.vault_uri
+}
