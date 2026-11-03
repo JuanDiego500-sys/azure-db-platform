@@ -18,3 +18,8 @@ variable "tags" {
     managed_by = "terraform"
   }
 }
+
+variable "allowed_ssh_cidr" {
+  description = "Your public IP in CIDR notation (e.g. 203.0.113.10/32). Only this address can SSH to the VM."
+  type        = string
+}
