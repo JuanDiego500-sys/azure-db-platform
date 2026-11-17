@@ -1,0 +1,61 @@
+# Runs on every Pull Request that touches Terraform code:
+# fmt (style) -> init -> validate (syntax) -> plan (what would change).
+# It never changes Azure: plan is read-only.
+name: terraform-plan
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - "terraform/**"
+      - ".github/workflows/terraform-plan.yml"
+
+# OIDC: allow the job to request a GitHub token that Azure will trust.
+permissions:
+  id-token: write # needed for OIDC login to Azure
+  contents: read # needed to check out the code
+
+# Never run two Terraform jobs at the same time (the state lock would fail anyway).
+concurrency:
+  group: terraform
+  cancel-in-progress: false
+
+env:
+  # azurerm provider + backend: log in with OIDC, no client secret.
+  ARM_USE_OIDC: "true"
+  ARM_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
+  ARM_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
+  ARM_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+  # Terraform variables (TF_VAR_<name> -> var.<name>).
+  TF_VAR_allowed_ssh_cidr: ${{ secrets.TF_VAR_ALLOWED_SSH_CIDR }}
+  TF_VAR_admin_object_id: ${{ secrets.TF_VAR_ADMIN_OBJECT_ID }}
+  TF_VAR_ssh_public_key: ${{ vars.TF_VAR_SSH_PUBLIC_KEY }}
+  TF_IN_AUTOMATION: "true"
+
+jobs:
+  plan:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: terraform
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: "~1.16"
+
+      - name: Terraform fmt
+        run: terraform fmt -check -recursive
+
+      - name: Terraform init
+        run: terraform init -input=false
+
+      - name: Terraform validate
+        run: terraform validate
+
+      - name: Terraform plan
+        run: terraform plan -input=false -lock-timeout=120s

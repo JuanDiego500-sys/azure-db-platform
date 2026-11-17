@@ -37,10 +37,9 @@ variable "admin_username" {
   default     = "azureuser"
 }
 
-variable "ssh_public_key_path" {
-  description = "Path to the SSH public key that is allowed to log in to the VM."
+variable "ssh_public_key" {
+  description = "SSH public key content (ssh-ed25519 AAAA...) allowed to log in to the VM."
   type        = string
-  default     = "~/.ssh/id_ed25519_azure.pub"
 }
 
 variable "auto_shutdown_time" {
@@ -53,4 +52,9 @@ variable "auto_shutdown_timezone" {
   description = "Windows timezone ID for the shutdown schedule (e.g. 'SA Pacific Standard Time' = Bogotá, UTC-5)."
   type        = string
   default     = "SA Pacific Standard Time"
+}
+
+variable "admin_object_id" {
+  description = "Entra ID object ID of the human admin who gets 'Key Vault Secrets Officer' on the vault."
+  type        = string
 }
