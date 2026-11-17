@@ -1,3 +1,7 @@
 # scripts
 
-Helper scripts, for example to deallocate the VM at the end of a session to save credit.
+Helper scripts.
+
+| Script | What it does |
+|---|---|
+| `bootstrap-backend.ps1` | Creates the Azure Storage account that holds the Terraform state (run once, before the first `terraform init`) |
