@@ -1,0 +1,72 @@
+# Manual-only: deletes everything Terraform manages (RG, VM, network, Key Vault).
+# The state backend (rg-tfstate) is NOT managed here, so it survives.
+name: terraform-destroy
+
+on:
+  workflow_dispatch:
+    inputs:
+      confirm:
+        description: 'Type "destroy" to confirm'
+        required: true
+        type: string
+
+permissions:
+  id-token: write # OIDC login (only works from main: ref:refs/heads/main)
+  contents: read
+
+# Same group as plan/apply: never destroy while another job is running.
+concurrency:
+  group: terraform
+  cancel-in-progress: false
+
+env:
+  ARM_USE_OIDC: "true"
+  ARM_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
+  ARM_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
+  ARM_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+  TF_VAR_allowed_ssh_cidr: ${{ secrets.TF_VAR_ALLOWED_SSH_CIDR }}
+  TF_VAR_admin_object_id: ${{ secrets.TF_VAR_ADMIN_OBJECT_ID }}
+  TF_VAR_ssh_public_key: ${{ vars.TF_VAR_SSH_PUBLIC_KEY }}
+  TF_IN_AUTOMATION: "true"
+
+jobs:
+  destroy:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: terraform
+
+    steps:
+      # Fail loudly (red X) instead of silently skipping.
+      # The input goes through an env var to avoid script injection.
+      - name: Check confirmation
+        working-directory: .
+        env:
+          CONFIRM: ${{ inputs.confirm }}
+        run: |
+          if [ "$CONFIRM" != "destroy" ]; then
+            echo "::error::Confirmation failed. Type exactly: destroy"
+            exit 1
+          fi
+          if [ "$GITHUB_REF" != "refs/heads/main" ]; then
+            echo "::error::Destroy can only run from main (got $GITHUB_REF)"
+            exit 1
+          fi
+
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: "~1.16"
+
+      - name: Terraform init
+        run: terraform init -input=false
+
+      # -destroy: plan the deletion of everything in the state.
+      - name: Terraform plan (destroy)
+        run: terraform plan -destroy -input=false -lock-timeout=120s -out=tfplan
+
+      - name: Terraform destroy
+        run: terraform apply -input=false -lock-timeout=120s tfplan
